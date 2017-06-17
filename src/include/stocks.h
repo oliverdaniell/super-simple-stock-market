@@ -12,11 +12,11 @@ double dividend_yield_common(double price, double last_dividend);
 
 /** @brief Calculate the dividend yield for preferred stock
  * @param[in] price The traded price of a share
- * @param[in] fixed_dividend Almost all preferred shares have a negotiated, fixed-dividend amount.
- * The dividend is specified as a fixed amount
+ * @param[in] fixed_dividend_fraction Almost all preferred shares have a negotiated, fixed-dividend amount.
+ * The dividend is specified as a fraction of the par value
  * @param[in] par_value The stated or face value
  */
-double dividend_yield_preferred(double price, double fixed_dividend, double par_value);
+double dividend_yield_preferred(double price, double fixed_dividend_fraction, double par_value);
 
 /** @brief Calculate the ratio of the price to the dividend
  * @param[in] price The traded price of a share
