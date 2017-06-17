@@ -1,4 +1,7 @@
+#include <algorithm>
 #include <chrono>
+#include <cmath>
+#include <numeric>
 
 /** @brief Namespace for simple stocks homework, unless otherwise stated all values are in dollars
  */
@@ -72,8 +75,9 @@ class trade
  */
 template <typename Iterator> double volume_weighted_stock_price(Iterator begin, Iterator end)
 {
-    auto weighted_traded_price = decltype(begin->traded_price() * begin->quantity_of_shares()){};
-    auto total_shares_bought = decltype(begin->quantity_of_shares()){};
+    auto weighted_traded_price =
+        std::decay_t<decltype(begin->traded_price() * begin->quantity_of_shares())>{};
+    auto total_shares_bought = std::decay_t<decltype(begin->quantity_of_shares())>{};
 
     for (; begin != end; ++begin)
     {
@@ -85,11 +89,12 @@ template <typename Iterator> double volume_weighted_stock_price(Iterator begin, 
 }
 
 /** @brief Calculate the GBCE all share index, this is the geometric mean of prices for all stocks
- * @param[in] begin Iterator to container of trades
- * @param[in] end Iterator to container of trades
+ * @param[in] begin Iterator to prices
+ * @param[in] end Iterator to prices
  */
 template <typename Iterator> double gbce_all_share_index(Iterator begin, Iterator end)
 {
-    return 0.0;
+    auto product = std::accumulate(begin, end, 1.0, [](auto a, auto b) { return a * b; });
+    return std::pow(product, 1.0 / std::distance(begin, end));
 }
 }

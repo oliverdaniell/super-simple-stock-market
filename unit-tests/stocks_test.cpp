@@ -102,3 +102,9 @@ TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minu
     REQUIRE(stocks::volume_weighted_stock_price(recent_trades.begin(), recent_trades.end()) ==
             Approx(22.0));
 }
+
+TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices for all stocks", "[1.b]")
+{
+	auto prices = std::vector<double> {1.0, 2.0, 3.0, 4.0, 5.0};
+	REQUIRE(stocks::gbce_all_share_index(prices.begin(), prices.end()) == Approx(2.61).epsilon(0.01));
+}
