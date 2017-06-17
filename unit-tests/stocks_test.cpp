@@ -85,7 +85,7 @@ TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minu
 {
     auto const now = std::chrono::system_clock::now();
 
-	//Create some trades over the last 30 minutes
+    // Create some trades over the last 30 minutes
     auto all_trades = std::vector<stocks::trade>{};
     for (int i = 0; i < 30; ++i)
     {
@@ -93,7 +93,7 @@ TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minu
                                               stocks::buy_sell_indicator::sell, (i + 1) * 2.0});
     }
 
-	//Select any trades that occurred in the last 15 minutes (inclusive)
+    // Select any trades that occurred in the last 15 minutes (inclusive)
     auto recent_trades = std::vector<stocks::trade>{};
     std::copy_if(
         all_trades.begin(), all_trades.end(), std::back_inserter(recent_trades),
@@ -103,8 +103,10 @@ TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minu
             Approx(22.0));
 }
 
-TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices for all stocks", "[1.b]")
+TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices for all stocks",
+          "[1.b]")
 {
-	auto prices = std::vector<double> {1.0, 2.0, 3.0, 4.0, 5.0};
-	REQUIRE(stocks::gbce_all_share_index(prices.begin(), prices.end()) == Approx(2.61).epsilon(0.01));
+    auto prices = std::vector<double>{1.0, 2.0, 3.0, 4.0, 5.0};
+    REQUIRE(stocks::gbce_all_share_index(prices.begin(), prices.end()) ==
+            Approx(2.61).epsilon(0.01));
 }

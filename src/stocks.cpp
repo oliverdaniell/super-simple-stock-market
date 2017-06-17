@@ -27,12 +27,12 @@ trade::trade(timestamp_type const &timestamp, int quantity_of_shares, buy_sell_i
     : m_timestamp{timestamp}, m_quantity_of_shares{quantity_of_shares}, m_buy_sell{buy_sell},
       m_traded_price{traded_price}
 {
-	assert(quantity_of_shares > 0);
-	assert(traded_price > 0.0);
+    assert(quantity_of_shares > 0);
+    assert(traded_price > 0.0);
 }
 trade::timestamp_type trade::timestamp() const
 {
-	return m_timestamp;
+    return m_timestamp;
 }
 int trade::quantity_of_shares() const
 {
