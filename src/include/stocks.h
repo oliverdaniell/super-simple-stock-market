@@ -12,8 +12,8 @@ double dividend_yield_common(double price, double last_dividend);
 
 /** @brief Calculate the dividend yield for preferred stock
  * @param[in] price The traded price of a share
- * @param[in] fixed_dividend_fraction Almost all preferred shares have a negotiated, fixed-dividend amount.
- * The dividend is specified as a fraction of the par value
+ * @param[in] fixed_dividend_fraction Almost all preferred shares have a negotiated, fixed-dividend
+ * amount. The dividend is specified as a fraction of the par value
  * @param[in] par_value The stated or face value
  */
 double dividend_yield_preferred(double price, double fixed_dividend_fraction, double par_value);
@@ -41,7 +41,7 @@ class trade
      * @param[in] timestamp The time at which the trade occurred
      * @param[in] quantity_of_shares Number of shares traded (quantity_of_shares > 0)
      * @param[in] buy_sell_indicator Were shares bought or sold
-     * @param[in] traded_price The price per share traded (traded_price >= 0.0)
+     * @param[in] traded_price The total price of the trade (traded_price >= 0.0)
      */
     trade(timestamp_type const &timestamp, int quantity_of_shares, buy_sell_indicator buy_sell,
           double traded_price);
@@ -55,7 +55,7 @@ class trade
     /** @brief Were shares bought or sold */
     buy_sell_indicator buy_sell() const;
 
-    /** @brief The price per share traded */
+    /** @brief The total price of the trade */
     double traded_price() const;
 
   private:
@@ -65,13 +65,23 @@ class trade
     double m_traded_price;
 };
 
-/** @brief Calculate the volume weighted stock price, this is the mean prices per share
+/** @brief Calculate the volume weighted stock price, assume this includes all shares traded (buy or
+ * sell)
  * @param[in] begin Iterator to container of trades
  * @param[in] end Iterator to container of trades
  */
 template <typename Iterator> double volume_weighted_stock_price(Iterator begin, Iterator end)
 {
-    return 0.0;
+    auto weighted_traded_price = decltype(begin->traded_price() * begin->quantity_of_shares()){};
+    auto total_shares_bought = decltype(begin->quantity_of_shares()){};
+
+    for (; begin != end; ++begin)
+    {
+        weighted_traded_price += begin->traded_price() * begin->quantity_of_shares();
+        total_shares_bought += begin->quantity_of_shares();
+    }
+
+    return weighted_traded_price / total_shares_bought;
 }
 
 /** @brief Calculate the GBCE all share index, this is the geometric mean of prices for all stocks

@@ -1,7 +1,9 @@
 #include "catch.hpp"
 #include <cmath>
+#include <iterator>
 #include <limits>
 #include <stocks.h>
+#include <vector>
 
 TEST_CASE("Given any price as input, calculate the dividend yield", "[1.a.i]")
 {
@@ -56,25 +58,47 @@ TEST_CASE(
     "Record a trade, with timestamp, quantity of shares, buy or sell indicator and traded price",
     "[1.a.iii]")
 {
-	SECTION("stocks::trade constructor 1")
-	{
-		auto const timestamp = std::chrono::system_clock::now();
-		auto trade = stocks::trade{ timestamp, 100, stocks::buy_sell_indicator::buy, 50.0 };
+    SECTION("stocks::trade constructor 1")
+    {
+        auto const timestamp = std::chrono::system_clock::now();
+        auto trade = stocks::trade{timestamp, 100, stocks::buy_sell_indicator::buy, 50.0};
 
-		REQUIRE(trade.buy_sell() == stocks::buy_sell_indicator::buy);
-		REQUIRE(trade.quantity_of_shares() == 100);
-		REQUIRE(trade.timestamp() == timestamp);
-		REQUIRE(trade.traded_price() == Approx(50.0));
-	}
+        REQUIRE(trade.buy_sell() == stocks::buy_sell_indicator::buy);
+        REQUIRE(trade.quantity_of_shares() == 100);
+        REQUIRE(trade.timestamp() == timestamp);
+        REQUIRE(trade.traded_price() == Approx(50.0));
+    }
 
-	SECTION("stocks::trade constructor 2")
-	{
-		auto const timestamp = std::chrono::system_clock::now();
-		auto trade = stocks::trade{ timestamp, 10, stocks::buy_sell_indicator::sell, 5.0 };
+    SECTION("stocks::trade constructor 2")
+    {
+        auto const timestamp = std::chrono::system_clock::now();
+        auto trade = stocks::trade{timestamp, 10, stocks::buy_sell_indicator::sell, 5.0};
 
-		REQUIRE(trade.buy_sell() == stocks::buy_sell_indicator::sell);
-		REQUIRE(trade.quantity_of_shares() == 10);
-		REQUIRE(trade.timestamp() == timestamp);
-		REQUIRE(trade.traded_price() == Approx(5.0));
-	}
+        REQUIRE(trade.buy_sell() == stocks::buy_sell_indicator::sell);
+        REQUIRE(trade.quantity_of_shares() == 10);
+        REQUIRE(trade.timestamp() == timestamp);
+        REQUIRE(trade.traded_price() == Approx(5.0));
+    }
+}
+
+TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minutes", "[1.a.iv]")
+{
+    auto const now = std::chrono::system_clock::now();
+
+	//Create some trades over the last 30 minutes
+    auto all_trades = std::vector<stocks::trade>{};
+    for (int i = 0; i < 30; ++i)
+    {
+        all_trades.emplace_back(stocks::trade{now - std::chrono::minutes{i}, i + 1,
+                                              stocks::buy_sell_indicator::sell, (i + 1) * 2.0});
+    }
+
+	//Select any trades that occurred in the last 15 minutes (inclusive)
+    auto recent_trades = std::vector<stocks::trade>{};
+    std::copy_if(
+        all_trades.begin(), all_trades.end(), std::back_inserter(recent_trades),
+        [now](auto const &trade) { return now - trade.timestamp() <= std::chrono::minutes{15}; });
+
+    REQUIRE(stocks::volume_weighted_stock_price(recent_trades.begin(), recent_trades.end()) ==
+            Approx(22.0));
 }
