@@ -1,9 +1,10 @@
 #include <algorithm>
+#include <assert.h>
 #include <chrono>
 #include <cmath>
 #include <numeric>
 
-/** @brief Namespace for simple stocks homework, unless otherwise stated all values are in dollars
+/** @brief Namespace for simple stocks homework, unless otherwise stated all values are in pennies
  */
 namespace stocks
 {
@@ -94,7 +95,31 @@ template <typename Iterator> double volume_weighted_stock_price(Iterator begin, 
  */
 template <typename Iterator> double gbce_all_share_index(Iterator begin, Iterator end)
 {
+#ifndef NDEBUG
+    for (auto it = begin; it != end; ++it)
+    {
+        assert(*it > 0.0);
+    }
+#endif
+
     auto product = std::accumulate(begin, end, 1.0, [](auto a, auto b) { return a * b; });
     return std::pow(product, 1.0 / std::distance(begin, end));
+}
+
+/** @brief Calculate the GBCE all share index, this is the geometric mean of prices for all stocks
+* @param[in] begin Iterator to prices
+* @param[in] end Iterator to prices
+*/
+template <typename Iterator> double gbce_all_share_index_stable(Iterator begin, Iterator end)
+{
+#ifndef NDEBUG
+	for (auto it = begin; it != end; ++it)
+	{
+		assert(*it > 0.0);
+	}
+#endif
+
+	auto product = std::accumulate(begin, end, 0.0, [](auto a, auto b) { return a + std::log(b); });
+	return std::exp(product / std::distance(begin,end));
 }
 }

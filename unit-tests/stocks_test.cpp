@@ -109,4 +109,7 @@ TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices
     auto prices = std::vector<double>{1.0, 2.0, 3.0, 4.0, 5.0};
     REQUIRE(stocks::gbce_all_share_index(prices.begin(), prices.end()) ==
             Approx(2.61).epsilon(0.01));
+
+	REQUIRE(stocks::gbce_all_share_index_stable(prices.begin(), prices.end()) ==
+		Approx(2.61).epsilon(0.01));
 }
