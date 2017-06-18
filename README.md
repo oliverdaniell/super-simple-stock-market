@@ -7,7 +7,7 @@ cd build
 cmake ..
 cmake --build .
 ```
-- Example usage can be found in unit-test/stocks_test.cpp
+- Example usage can be found in unit-tests/stocks_test.cpp
 - Source code can be found in src/
 - Documentation (Doxygen) can be found inline in the header files
 
