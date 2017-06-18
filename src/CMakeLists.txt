@@ -4,6 +4,7 @@ set(SRC_FILES
 
 set(HDR_FILES
     "include/stocks.h"
+    "include/market.h"
 )
 
 add_library(

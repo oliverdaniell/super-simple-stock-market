@@ -1,8 +1,11 @@
+#pragma once
+
 #include <algorithm>
 #include <assert.h>
 #include <chrono>
 #include <cmath>
 #include <numeric>
+#include <set>
 
 /** @brief Namespace for simple stocks homework, unless otherwise stated all values are in pennies
  */

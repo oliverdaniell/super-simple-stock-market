@@ -1,8 +1,10 @@
+#include <market.h>
+#include <stocks.h>
+
 #include "catch.hpp"
 #include <cmath>
 #include <iterator>
 #include <limits>
-#include <stocks.h>
 #include <vector>
 
 TEST_CASE("Given any price as input, calculate the dividend yield", "[1.a.i]")
@@ -79,6 +81,17 @@ TEST_CASE(
         REQUIRE(trade.timestamp() == timestamp);
         REQUIRE(trade.traded_price() == Approx(5.0));
     }
+
+    SECTION("Record a trade")
+    {
+        auto const timestamp = std::chrono::system_clock::now();
+        auto trade = stocks::trade{timestamp, 10, stocks::buy_sell_indicator::sell, 5.0};
+
+        auto market = stocks::market{};
+        market.emplace(trade);
+
+        REQUIRE(market.size() == 1u);
+    }
 }
 
 TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minutes", "[1.a.iv]")
@@ -86,21 +99,18 @@ TEST_CASE("Calculate Volume Weighted Stock Price based on trades in past 15 minu
     auto const now = std::chrono::system_clock::now();
 
     // Create some trades over the last 30 minutes
-    auto all_trades = std::vector<stocks::trade>{};
+    auto trades = stocks::market{};
     for (int i = 0; i < 30; ++i)
     {
-        all_trades.emplace_back(stocks::trade{now - std::chrono::minutes{i}, i + 1,
-                                              stocks::buy_sell_indicator::sell, (i + 1) * 2.0});
+        trades.emplace_hint(trades.begin(),
+                            stocks::trade{now - std::chrono::minutes{i}, i + 1,
+                                          stocks::buy_sell_indicator::sell, (i + 1) * 2.0});
     }
 
     // Select any trades that occurred in the last 15 minutes (inclusive)
-    auto recent_trades = std::vector<stocks::trade>{};
-    std::copy_if(
-        all_trades.begin(), all_trades.end(), std::back_inserter(recent_trades),
-        [now](auto const &trade) { return now - trade.timestamp() <= std::chrono::minutes{15}; });
+    auto recent_trades = trades.lower_bound(now - std::chrono::minutes{15});
 
-    REQUIRE(stocks::volume_weighted_stock_price(recent_trades.begin(), recent_trades.end()) ==
-            Approx(22.0));
+    REQUIRE(stocks::volume_weighted_stock_price(recent_trades, trades.end()) == Approx(22.0));
 }
 
 TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices for all stocks",
@@ -110,6 +120,6 @@ TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices
     REQUIRE(stocks::gbce_all_share_index(prices.begin(), prices.end()) ==
             Approx(2.61).epsilon(0.01));
 
-	REQUIRE(stocks::gbce_all_share_index_stable(prices.begin(), prices.end()) ==
-		Approx(2.61).epsilon(0.01));
+    REQUIRE(stocks::gbce_all_share_index_stable(prices.begin(), prices.end()) ==
+            Approx(2.61).epsilon(0.01));
 }
