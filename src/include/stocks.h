@@ -112,6 +112,11 @@ template <typename Iterator> double gbce_all_share_index(Iterator begin, Iterato
 }
 
 /** @brief Calculate the GBCE all share index, this is the geometric mean of prices for all stocks
+ *
+ * The stable version of this algorithm calculates the product of all prices as the sum of the log
+ * of all prices. As can be seen in stocks_test.cpp the naive algorithm will calcualte an infinite
+ * product for a relatively small number of stock prices ~171
+ *
  * @param[in] begin Iterator to prices
  * @param[in] end Iterator to prices
  */

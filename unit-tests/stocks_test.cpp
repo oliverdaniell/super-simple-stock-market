@@ -123,3 +123,17 @@ TEST_CASE("Calculate the GBCE All Share Index using the geometric mean of prices
     REQUIRE(stocks::gbce_all_share_index_stable(prices.begin(), prices.end()) ==
             Approx(2.61).epsilon(0.01));
 }
+
+//This test case is turned off by default (remove the [.] tag to turn it on)
+TEST_CASE("Calculate the point at which the geometric mean stable/unstable algorithms differ","[.]")
+{
+    std::vector<double> prices{1};
+
+    for (int i = 2; i < 1000000; ++i)
+    {
+        INFO(i);
+        prices.push_back(double(i));
+        REQUIRE(stocks::gbce_all_share_index(prices.begin(), prices.end()) ==
+                Approx(stocks::gbce_all_share_index_stable(prices.begin(), prices.end())));
+    }
+}
